@@ -43,10 +43,20 @@ double perform(NNet& net){
 }
 
 
+
+void callback(NetEntry entry){
+    static Timer timer;
+    double t=timer.stop();
+    print(Timer::format(t),"\t",entry.performance);
+    timer.start();
+}
+
+
 int main(){
     srand(time(NULL));
     vec<size_t> netshape(5,5);
 
     Trainer trainer(netshape,activation,perform);
+    trainer.gen_callback=callback;
     trainer.train(999);
 }

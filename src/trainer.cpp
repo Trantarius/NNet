@@ -21,7 +21,8 @@ NetEntry Trainer::train(size_t gen_count){
     for(size_t n=0;n<gen_count;n++){
         generation(gen,alt);
         swap(gen,alt);
-        print(gen[0].performance);
+        gen_callback(gen[0]);
+        //print(gen[0].performance);
     }
     NetEntry ret=NetEntry(gen[0].net->clone(),gen[0].performance);
     for(size_t n=0;n<gen.size();n++){
