@@ -1,17 +1,21 @@
 #pragma once
 #include "net.hpp"
 #include <cmath>
-#include <list>
+#include <vector>
+#include <algorithm>
 
 struct Trainer{
+    const vec<size_t> shape;
+    double (* const act_func)(double);
+    dvec (* const target_func)(dvec);
+
     size_t nets_per_gen=10000;
     size_t samples_per_net=100;
     double mutation_rate=0.01;
     size_t keep_ratio=10;
 
-    dvec target_function(dvec in){
-        return dvec(sin(in[1]),cos(in[0]),sin(in[4]),cos(in[2]),sin(in[3]));
-    }
+    Trainer(vec<size_t>& shape,double (*activ)(double),dvec (*target)(dvec)):
+        shape(shape),act_func(activ),target_func(target){}
 
     struct NetEntry{
         NNet* net;
@@ -19,28 +23,29 @@ struct Trainer{
         bool operator<(const NetEntry& b){
             return performance<b.performance;
         }
+        NetEntry():net(NULL){}
         NetEntry(NNet* net):net(net){}
     };
 
-    dvec rand_5(){
-        dvec v(5);
-        for(int n=0;n<5;n++){
+    dvec randvec(size_t s){
+        dvec v(s);
+        for(int n=0;n<s;n++){
             v[n]=(double)rand()/RAND_MAX;
         }
         return v;
     }
 
     double perform(NetEntry& ne){
-        dvec* inputs=dvec::new_array(5,samples_per_net);
-        dvec* target=dvec::new_array(5,samples_per_net);
-        dvec* output=dvec::new_array(5,samples_per_net);
+        dvec* inputs=dvec::new_array(shape[0],samples_per_net);
+        dvec* target=dvec::new_array(shape[shape.size()-1],samples_per_net);
+        dvec* output=dvec::new_array(shape[shape.size()-1],samples_per_net);
         double total_err=0;
         for(size_t n=0;n<samples_per_net;n++){
-            inputs[n]=rand_5();
-            target[n]=target_function(inputs[n]);
+            inputs[n]=randvec(shape[0]);
+            target[n]=target_func(inputs[n]);
             output[n]=ne.net->eval(inputs[n]);
             dvec errv=output[n]-target[n];
-            for(int i=0;i<5;i++){
+            for(int i=0;i<errv.size();i++){
                 total_err+=fabs(errv[i]);
             }
         }
@@ -50,40 +55,32 @@ struct Trainer{
         return total_err;
     }
 
-    std::list<NetEntry> generation(std::list<NetEntry> last){
-        std::list<NetEntry> next;
-        auto last_it=last.begin();
+    void generation(std::vector<NetEntry>& last,std::vector<NetEntry>& next){
         for(size_t n=0;n<nets_per_gen;n++){
-            next.push_back(NetEntry((*last_it).net->clone()));
-            next.back().net->mutate(mutation_rate);
-            next.back().performance=perform(next.back());
-            if(n%keep_ratio==keep_ratio-1){
-                last_it++;
-            }
+            next[n].net->copy(*last[n/keep_ratio].net);
+            next[n].net->mutate(mutation_rate);
+            next[n].performance=perform(next[n]);
         }
-        next.sort();
-        return next;
+        sort(next.begin(),next.end());
     }
 
     NNet* train(size_t gen_count,vec<size_t> shape,double(*act_func)(double)){
-        std::list<NetEntry> gen;
+        std::vector<NetEntry> gen(nets_per_gen);
+        std::vector<NetEntry> alt(nets_per_gen);
         for(size_t n=0;n<nets_per_gen;n++){
-            gen.push_back(NetEntry(new NNet(shape,act_func)));
+            gen[n]=NetEntry(new NNet(shape,act_func));
+            alt[n]=NetEntry(new NNet(shape,act_func));
         }
-        std::list<NetEntry> tmp;
         for(size_t n=0;n<gen_count;n++){
-            tmp.swap(gen);
-            gen=generation(tmp);
-            for(auto tmp_it=tmp.begin();tmp_it!=tmp.end();tmp_it++){
-                delete (*tmp_it).net;
-            }
-            print(gen.front().performance);
+            generation(gen,alt);
+            swap(gen,alt);
+            print(gen[0].performance);
         }
-        auto gen_it=gen.begin();
-        gen_it++;
-        for(;gen_it!=gen.end();gen_it++){
-                delete (*gen_it).net;
-            }
-        return gen.front().net;
+        NNet* ret=gen[0].net->clone();
+        for(size_t n=0;n<gen.size();n++){
+            delete gen[n].net;
+            delete alt[n].net;
+        }
+        return ret;
     }
 };

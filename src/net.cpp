@@ -67,17 +67,15 @@ dvec NNet::eval(dvec v){
 NNet* NNet::clone(){
     NNet* ret=new NNet(shape,activation_function);
     for(size_t layer=0;layer<shape.size()-1;layer++){
-
-        for(size_t n=0;n<weights[layer]->rows();n++){
-            for(size_t m=0;m<weights[layer]->cols();m++){
-                (*ret->weights[layer])[n][m]=(*weights[layer])[n][m];
-            }
-        }
-
-        for(size_t n=0;n<biases[layer]->size();n++){
-            (*ret->biases[layer])[n]=(*biases[layer])[n];
-        }
-
+        *ret->weights[layer]=*weights[layer];
+        *ret->biases[layer]=*biases[layer];
     }
     return ret;
+}
+
+void NNet::copy(NNet& b){
+    for(size_t layer=0;layer<shape.size()-1;layer++){
+        *weights[layer]=*b.weights[layer];
+        *biases[layer]=*b.biases[layer];
+    }
 }
