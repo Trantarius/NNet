@@ -1,6 +1,6 @@
  
 #include "net.hpp"
-
+#include <cmath>
 
 double ih_rand(){
     double ret=0;
@@ -78,4 +78,30 @@ void NNet::copy(NNet& b){
         *weights[layer]=*b.weights[layer];
         *biases[layer]=*b.biases[layer];
     }
+}
+
+#define E 2.71828182845904523536
+
+double NNet::Activation::logistic(double x){
+    return 1/(exp(-2*x)+1);
+}
+
+double NNet::Activation::sigmoid(double x){
+    return (exp(2*x)-1)/(exp(2*x)+1);
+}
+
+double NNet::Activation::relu(double x){
+    return x*(copysign(1,x)+1)/2;
+}
+
+double NNet::Activation::dying_sigmoid(double x){
+    return x/(exp(x*x/(2*E)));
+}
+
+double NNet::Activation::softplus(double x){
+    return log(exp(x)+1);
+}
+
+double NNet::Activation::swish(double x){
+    return x/(exp(-x)+1);
 }
