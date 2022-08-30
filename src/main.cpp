@@ -4,10 +4,6 @@
 #include <cmath>
 #include <ctime>
 
-double activation(double x){
-    return sin(x);
-}
-
 dvec target_function(dvec in){
     return dvec(sin(in[1]),cos(in[0]),sin(in[4]),cos(in[2]),sin(in[3]));
 }
@@ -42,10 +38,9 @@ double perform(NNet& net){
     return total_err;
 }
 
-
+Timer timer;
 
 void callback(NetEntry entry){
-    static Timer timer;
     double t=timer.stop();
     print(Timer::format(t),"\t",entry.performance);
     timer.start();
@@ -56,7 +51,8 @@ int main(){
     srand(time(NULL));
     vec<size_t> netshape(5,5);
 
-    Trainer trainer(netshape,activation,perform);
+    Trainer trainer(netshape,NNet::Activation::relu,perform);
     trainer.gen_callback=callback;
-    trainer.train(999);
+    timer.start();
+    trainer.train(100);
 }
