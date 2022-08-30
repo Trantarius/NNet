@@ -11,4 +11,5 @@ struct NNet{
     ~NNet();
     dvec eval(dvec in);
     void mutate(double std_dev);
+    NNet* clone();
 };
