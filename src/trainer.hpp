@@ -1,7 +1,6 @@
 #pragma once
 #include "net.hpp"
 #include <cmath>
-#include <vector>
 #include <algorithm>
 
 struct NetEntry{
@@ -26,7 +25,6 @@ struct Trainer{
     void (*gen_callback)(NetEntry entry)=[](NetEntry){};
 
     size_t nets_per_gen=10000;
-    size_t samples_per_net=100;
     double mutation_rate=0.01;
     size_t keep_ratio=10;
 

@@ -53,6 +53,7 @@ int main(){
 
     Trainer trainer(netshape,NNet::Activation::dying_sigmoid,perform);
     trainer.gen_callback=callback;
+    trainer.keep_ratio=10;
     timer.start();
     trainer.train(100);
 }
