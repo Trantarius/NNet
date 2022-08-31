@@ -51,7 +51,7 @@ int main(){
     srand(time(NULL));
     vec<size_t> netshape(5,5);
 
-    Trainer trainer(netshape,NNet::Activation::relu,perform);
+    Trainer trainer(netshape,NNet::Activation::dying_sigmoid,perform);
     trainer.gen_callback=callback;
     timer.start();
     trainer.train(100);

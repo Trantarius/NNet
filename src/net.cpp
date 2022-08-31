@@ -49,19 +49,14 @@ void NNet::mutate(double sd){
 }
 
 dvec NNet::eval(dvec v){
-    dvec* run=new dvec(v.size());
-    *run=v;
     for(size_t layer=0;layer<shape.size()-1;layer++){
-        dvec tmp = (*weights[layer])**run + (*biases[layer]);
-        delete run;
-        run=new dvec(tmp);
-        for(size_t n=0;n<run->size();n++){
-            (*run)[n]=activation_function((*run)[n]);
+        dvec tmp = (*weights[layer])*v + (*biases[layer]);
+        swap(v,tmp);
+        for(size_t n=0;n<v.size();n++){
+            v[n]=activation_function(v[n]);
         }
     }
-    dvec ret(*run);
-    delete run;
-    return ret;
+    return v;
 }
 
 NNet* NNet::clone(){

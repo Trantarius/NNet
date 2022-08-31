@@ -7,7 +7,6 @@
 struct NetEntry{
     NNet* net;
     double performance=(double)(uint)(-1);
-    //NetEntry():net(NULL){}
     NetEntry(NNet* net=NULL,double performance=(double)(uint)(-1)):net(net),performance(performance){}
 };
 
@@ -34,7 +33,7 @@ struct Trainer{
     Trainer(vec<size_t> shape,activation_func_t activ,double(*perform_func)(NNet&)):
         shape(shape),act_func(activ),perform_func(perform_func){}
 
-    void generation(std::vector<NetEntry>& last,std::vector<NetEntry>& next);
+    void generation(vec<NetEntry>& last,vec<NetEntry>& next);
 
     NetEntry train(size_t gen_count);
 };
