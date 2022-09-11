@@ -10,8 +10,8 @@ typedef double (*activation_func_t)(double);
 
 struct NNet{
     const vec<size_t> shape;
-    dmat** weights;
-    dvec** biases;
+    dmat* weights;
+    dvec* biases;
     activation_func_t activation_function;
 
     NNet(vec<size_t> shape,activation_func_t act_func);

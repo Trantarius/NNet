@@ -12,22 +12,16 @@ double ih_rand(){
 
 
 NNet::NNet(vec<size_t> shape,double (*afunc)(double)):shape(shape),activation_function(afunc){
-    weights=new dmat*[shape.size()-1];
-    biases=new dvec*[shape.size()-1];
+    weights=new dmat[shape.size()-1];
+    biases=new dvec[shape.size()-1];
 
     for(size_t layer=0;layer<shape.size()-1;layer++){
-        weights[layer]=new dmat(shape[layer+1],shape[layer]);
-        *weights[layer]=dmat::identity(shape[layer+1],shape[layer]);
-        biases[layer]=new dvec(shape[layer+1]);
-        biases[layer]->fill(0);
+        weights[layer]=dmat::identity(shape[layer+1],shape[layer]);
+        biases[layer]=dvec(shape[layer+1]).fill(0);
     }
 }
 
 NNet::~NNet(){
-    for(size_t layer=0;layer<shape.size()-1;layer++){
-        delete weights[layer];
-        delete biases[layer];
-    }
     delete [] weights;
     delete [] biases;
 }
@@ -35,14 +29,14 @@ NNet::~NNet(){
 void NNet::mutate(double sd){
     for(size_t layer=0;layer<shape.size()-1;layer++){
 
-        for(size_t n=0;n<weights[layer]->rows();n++){
-            for(size_t m=0;m<weights[layer]->cols();m++){
-                (*weights[layer])[n][m]+=ih_rand()*sd;
+        for(size_t n=0;n<weights[layer].rows();n++){
+            for(size_t m=0;m<weights[layer].cols();m++){
+                (weights[layer])[n][m]+=ih_rand()*sd;
             }
         }
 
-        for(size_t n=0;n<biases[layer]->size();n++){
-            (*biases[layer])[n]+=ih_rand()*sd;
+        for(size_t n=0;n<biases[layer].size();n++){
+            (biases[layer])[n]+=ih_rand()*sd;
         }
 
     }
@@ -50,8 +44,7 @@ void NNet::mutate(double sd){
 
 dvec NNet::eval(dvec v){
     for(size_t layer=0;layer<shape.size()-1;layer++){
-        dvec tmp = (*weights[layer])*v + (*biases[layer]);
-        swap(v,tmp);
+        v = weights[layer]*v + biases[layer];
         for(size_t n=0;n<v.size();n++){
             v[n]=activation_function(v[n]);
         }
@@ -62,16 +55,16 @@ dvec NNet::eval(dvec v){
 NNet* NNet::clone(){
     NNet* ret=new NNet(shape,activation_function);
     for(size_t layer=0;layer<shape.size()-1;layer++){
-        *ret->weights[layer]=*weights[layer];
-        *ret->biases[layer]=*biases[layer];
+        ret->weights[layer]=weights[layer];
+        ret->biases[layer]=biases[layer];
     }
     return ret;
 }
 
 void NNet::copy(NNet& b){
     for(size_t layer=0;layer<shape.size()-1;layer++){
-        *weights[layer]=*b.weights[layer];
-        *biases[layer]=*b.biases[layer];
+        weights[layer]=b.weights[layer];
+        biases[layer]=b.biases[layer];
     }
 }
 
