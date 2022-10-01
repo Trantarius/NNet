@@ -24,7 +24,7 @@ public:
     Trainer(vec<size_t> shape,activation_func_t activ):
         shape(shape),act_func(activ){}
 
-    virtual double perform(NNet& net)=0;
+    virtual double perform(const NNet& net)=0;
     void generation(vec<NetEntry>& last,vec<NetEntry>& next);
 
     NetEntry train(size_t gen_count);

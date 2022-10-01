@@ -8,7 +8,7 @@ dvec randvec(size_t s){
     return v;
 }
 
-double ImitatorTrainer::perform(NNet& net){
+double ImitatorTrainer::perform(const NNet& net){
     dvec* inputs=dvec::new_array(net.shape[0],samples_per_net);
     dvec* target=dvec::new_array(net.shape[net.shape.size()-1],samples_per_net);
     dvec* output=dvec::new_array(net.shape[net.shape.size()-1],samples_per_net);

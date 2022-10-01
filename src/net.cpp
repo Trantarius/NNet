@@ -42,7 +42,7 @@ void NNet::mutate(double sd){
     }
 }
 
-dvec NNet::eval(dvec v){
+dvec NNet::eval(dvec v) const {
     for(size_t layer=0;layer<shape.size()-1;layer++){
         v = weights[layer]*v + biases[layer];
         for(size_t n=0;n<v.size();n++){
@@ -52,7 +52,7 @@ dvec NNet::eval(dvec v){
     return v;
 }
 
-NNet* NNet::clone(){
+NNet* NNet::clone() const {
     NNet* ret=new NNet(shape,activation_function);
     for(size_t layer=0;layer<shape.size()-1;layer++){
         ret->weights[layer]=weights[layer];

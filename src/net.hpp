@@ -17,9 +17,9 @@ struct NNet{
 
     NNet(vec<size_t> shape,activation_func_t act_func);
     ~NNet();
-    dvec eval(dvec in);
+    dvec eval(dvec in) const;
     void mutate(double std_dev);
-    NNet* clone();
+    NNet* clone() const;
     void copy(NNet& b);
 
     static struct Activation{
