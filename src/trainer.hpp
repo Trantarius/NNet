@@ -9,17 +9,11 @@ struct NetEntry{
     NetEntry(NNet* net=NULL,double performance=(double)(uint)(-1)):net(net),performance(performance){}
 };
 
-struct Trainer{
+class Trainer{
+public:
+    enum SORT_MODE{ASCENDING,DESCENDING} sort_mode;
     const vec<size_t> shape;
     const activation_func_t act_func;
-
-    static bool sort_ascending(const NetEntry& a,const NetEntry& b){
-        return a.performance<b.performance;
-    }
-    static bool sort_descending(const NetEntry& a,const NetEntry& b){
-        return a.performance<b.performance;
-    }
-    bool(*sort_mode)(const NetEntry&,const NetEntry&)=sort_ascending;
 
     double (*perform_func)(NNet&);
     void (*gen_callback)(NetEntry entry)=[](NetEntry){};

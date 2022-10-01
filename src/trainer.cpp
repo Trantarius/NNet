@@ -12,13 +12,25 @@ size_t biased_idx(size_t base,size_t bias_strength,size_t max){
     return (size_t)(x*max)%max;
 }
 
+bool sort_ascending_comp(const NetEntry& a,const NetEntry& b){
+    return a.performance<b.performance;
+}
+bool sort_descending_comp(const NetEntry& a,const NetEntry& b){
+    return b.performance<a.performance;
+}
+
 void Trainer::generation(vec<NetEntry>& last,vec<NetEntry>& next){
     for(size_t n=0;n<nets_per_gen;n++){
         next[n].net->copy(*last[biased_idx(n,keep_ratio,nets_per_gen)].net);
         next[n].net->mutate(mutation_rate);
         next[n].performance=perform_func(*next[n].net);
     }
-    std::sort(&next,&next+next.size(),sort_mode);
+
+    std::sort(&next,&next+next.size(),(
+        sort_mode==SORT_MODE::ASCENDING?
+            sort_ascending_comp:
+            sort_descending_comp
+    ));
 }
 
 NetEntry Trainer::train(size_t gen_count){
