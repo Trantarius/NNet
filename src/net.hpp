@@ -8,6 +8,7 @@
 
 typedef double (*activation_func_t)(double);
 
+
 struct NNet{
     const vec<size_t> shape;
     dmat* weights;

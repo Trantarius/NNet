@@ -11,20 +11,20 @@ struct NetEntry{
 
 class Trainer{
 public:
-    enum SORT_MODE{ASCENDING,DESCENDING} sort_mode;
+    enum SORT_MODE{ASCENDING,DESCENDING} sort_mode=ASCENDING;
     const vec<size_t> shape;
     const activation_func_t act_func;
 
-    double (*perform_func)(NNet&);
     void (*gen_callback)(NetEntry entry)=[](NetEntry){};
 
     size_t nets_per_gen=10000;
     double mutation_rate=0.01;
     size_t keep_ratio=10;
 
-    Trainer(vec<size_t> shape,activation_func_t activ,double(*perform_func)(NNet&)):
-        shape(shape),act_func(activ),perform_func(perform_func){}
+    Trainer(vec<size_t> shape,activation_func_t activ):
+        shape(shape),act_func(activ){}
 
+    virtual double perform(NNet& net)=0;
     void generation(vec<NetEntry>& last,vec<NetEntry>& next);
 
     NetEntry train(size_t gen_count);

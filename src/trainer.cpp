@@ -23,7 +23,7 @@ void Trainer::generation(vec<NetEntry>& last,vec<NetEntry>& next){
     for(size_t n=0;n<nets_per_gen;n++){
         next[n].net->copy(*last[biased_idx(n,keep_ratio,nets_per_gen)].net);
         next[n].net->mutate(mutation_rate);
-        next[n].performance=perform_func(*next[n].net);
+        next[n].performance=perform(*next[n].net);
     }
 
     std::sort(&next,&next+next.size(),(
