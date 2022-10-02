@@ -18,13 +18,13 @@ dvec target_function(dvec in){
 
 Timer timer;
 
-void gen_callback(Trainer* trainer,size_t n,NetEntry entry){
+void gen_callback(MonteCarloTrainer* trainer,size_t n,NetEntry entry){
     double t=timer.stop();
     printw(16,Timer::format(t),entry.performance," "," "," "," ");
     timer.start();
 }
 
-void perf_callback(Trainer* trainer,size_t n,NetEntry entry){
+void perf_callback(MonteCarloTrainer* trainer,size_t n,NetEntry entry){
     static std::mutex mtx;
     mtx.lock();
     print_loadbar((double)n/trainer->nets_per_gen);
@@ -61,21 +61,23 @@ bloc<Image> load_images(path dir){
 
 int main(){
     srand(time(NULL));
-    vec<size_t> netshape(27,3);
+    vec<size_t> netshape(5,5);
 
-    bloc<Image> inputs=load_images("noiseimages");
-    bloc<Image> outputs=load_images("images");
+    //bloc<Image> inputs=load_images("noiseimages");
+    //bloc<Image> outputs=load_images("images");
 
-    ConvolverTrainer trainer(1,netshape,NNet::Activation::logistic,inputs,outputs);
+    //ConvolverTrainer trainer(1,netshape,NNet::Activation::logistic,inputs,outputs);
+    ImitatorTrainer trainer(netshape,NNet::Activation::dying_sigmoid,target_function);
     trainer.gen_callback=gen_callback;
     trainer.perf_callback=perf_callback;
 
+    trainer.gen_count=100;
     trainer.samples_per_net=10;
-    trainer.nets_per_gen=1000;
-    trainer.mutation_rate=0.1;
+    trainer.nets_per_gen=10000;
+    trainer.mutation_rate=0.01;
     trainer.keep_ratio=10;
     trainer.log_enabled=true;
 
     timer.start();
-    trainer.train(100);
+    trainer.train();
 }

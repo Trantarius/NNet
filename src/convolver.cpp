@@ -4,7 +4,7 @@
 ConvolverTrainer::ConvolverTrainer(size_t kernel_radius,vec<size_t> shape,
                                    activation_func_t act_func,bloc<Image> inputs,
                                    bloc<Image> outputs):
-    Trainer(shape,act_func),kernel_radius(kernel_radius),
+    MonteCarloTrainer(shape,act_func),kernel_radius(kernel_radius),
     inputs(inputs),outputs(outputs){}
 
 

@@ -1,9 +1,9 @@
 #pragma once
 #include "net.hpp"
-#include "trainer.hpp"
+#include "montecarlo.hpp"
 #include "../png++/png.hpp"
 
-class ConvolverTrainer:public Trainer{
+class ConvolverTrainer:public MonteCarloTrainer{
 public:
     typedef png::image<png::rgb_pixel> Image;
     const size_t kernel_radius;
