@@ -5,6 +5,7 @@
 #include <cmath>
 #include <ctime>
 #include <filesystem>
+#include <cstdlib>
 
 typedef png::image<png::rgb_pixel> Image;
 using std::filesystem::path;
@@ -24,6 +25,21 @@ void callback(NetEntry entry){
 }
 
 
+void print_loadbar(double completion){
+    string out="\r[";
+    int total_length=64;
+    int filled=total_length*completion;
+    for(int n=0;n<filled;n++){
+        out+='#';
+    }
+    for(int n=0;n<total_length-filled;n++){
+        out+=' ';
+    }
+    out+="]";
+    std::cout<<out;
+}
+
+
 bloc<Image> load_images(path dir){
     size_t file_count=0;
     for(directory_entry entry:directory_iterator(dir)){
@@ -35,10 +51,16 @@ bloc<Image> load_images(path dir){
     bloc<Image> images(file_count);
     size_t idx=0;
     for(directory_entry entry:directory_iterator(dir)){
+        try{
         if(entry.path().extension()!=string(".png")){
             continue;
         }
+        //system(("magick "+entry.path().string()+" -strip "+entry.path().string()).c_str());
         images[idx++].read(entry.path());
+        print_loadbar(idx/(double)file_count);
+        }catch(png::error e){
+            print("file: ",entry.path().string());
+        }
     }
     return images;
 }

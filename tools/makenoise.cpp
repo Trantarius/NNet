@@ -64,7 +64,18 @@ struct Task{
     }
 
     void perform_magick(){
+        path inpng=(infile.parent_path()/infile.stem().concat(".png"));
+        system(("magick "+infile.string()+" "+inpng.string()).c_str());
         system(("magick "+infile.string()+" -attenuate "+tostr(noise_amount)+" +noise Gaussian "+outfile.string()).c_str());
+        system(("rm "+infile.string()).c_str());
+
+        //fix formatting errors by reading and writing it back. only necessary to suppress warnings.
+        Image img(inpng);
+        system(("rm "+inpng.string()).c_str());
+        img.write(inpng);
+        img.read(outfile);
+        system(("rm "+outfile.string()).c_str());
+        img.write(outfile);
     }
 
 };
@@ -88,10 +99,7 @@ int main(){
     int next_list_idx=0;
 
     for(directory_entry entry:directory_iterator(inpath)){
-        if(entry.path().extension()!=string(".png")){
-            continue;
-        }
-        path outentry=outpath/entry.path().filename();
+        path outentry=outpath/entry.path().stem().concat(".png");
         tasks[next_list_idx].push_back(Task(randf(),entry.path(),outentry));
         next_list_idx=(next_list_idx+1)%thread_count;
     }
