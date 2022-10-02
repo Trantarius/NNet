@@ -70,12 +70,12 @@ void NNet::copy(NNet& b){
 
 #define E 2.71828182845904523536
 
-double NNet::Activation::logistic(double x){
+double NNet::Activation::sigmoid(double x){
     return 1/(exp(-2*x)+1);
 }
 
-double NNet::Activation::sigmoid(double x){
-    return (exp(2*x)-1)/(exp(2*x)+1);
+double NNet::Activation::logistic(double x){
+    return tanh(x);
 }
 
 double NNet::Activation::relu(double x){
