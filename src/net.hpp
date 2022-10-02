@@ -22,12 +22,12 @@ struct NNet{
     NNet* clone() const;
     void copy(NNet& b);
 
-    static struct Activation{
+    struct Activation{
         static double logistic(double x);
         static double sigmoid(double x);
         static double relu(double x);
         static double dying_sigmoid(double x);
         static double softplus(double x);
         static double swish(double x);
-    } activation;
+    };
 };
