@@ -8,6 +8,6 @@ public:
     dvec (*target_function)(dvec);
     virtual double perform(const NNet& net);
 
-    ImitatorTrainer(vec<size_t> shape,activation_func_t act_func,dvec(*target_func)(dvec)):
-        MonteCarloTrainer(shape,act_func),target_function(target_func){}
+    ImitatorTrainer(Netshape shape,dvec(*target_func)(dvec)):
+        MonteCarloTrainer(shape),target_function(target_func){}
 };

@@ -11,11 +11,9 @@ struct NetEntry{
 
 class Trainer{
 public:
-    const vec<size_t> shape;
-    const activation_func_t act_func;
+    const Netshape net_shape;
 
-    Trainer(vec<size_t> shape,activation_func_t activ):
-        shape(shape),act_func(activ){}
+    Trainer(Netshape shape):net_shape(shape){}
 
     virtual NetEntry train()=0;
 };

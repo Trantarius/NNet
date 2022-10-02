@@ -51,12 +51,12 @@ namespace ConvolverDemo{
 
     void demo(){
         srand(time(NULL));
-        vec<size_t> netshape(27,3);
+        Netshape netshape(vec<size_t>(27,3),Activation::tanh);
 
         bloc<Image> inputs=load_images("noiseimages");
         bloc<Image> outputs=load_images("images");
 
-        ConvolverTrainer trainer(1,netshape,NNet::Activation::logistic,inputs,outputs);
+        ConvolverTrainer trainer(netshape,1,inputs,outputs);
         trainer.gen_callback=gen_callback;
         trainer.perf_callback=perf_callback;
 

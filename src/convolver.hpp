@@ -14,5 +14,5 @@ public:
 
     Image eval_img(const NNet& net,const Image& input);
 
-    ConvolverTrainer(size_t kernel_radius,vec<size_t> shape,activation_func_t act_func,bloc<Image> inputs,bloc<Image> outputs);
+    ConvolverTrainer(Netshape shape,size_t kernel_radius,bloc<Image> inputs,bloc<Image> outputs);
 };

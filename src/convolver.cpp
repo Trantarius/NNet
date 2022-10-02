@@ -1,10 +1,9 @@
 #include "convolver.hpp"
 #include <cmath>
 
-ConvolverTrainer::ConvolverTrainer(size_t kernel_radius,vec<size_t> shape,
-                                   activation_func_t act_func,bloc<Image> inputs,
+ConvolverTrainer::ConvolverTrainer(Netshape shape,size_t kernel_radius,bloc<Image> inputs,
                                    bloc<Image> outputs):
-    MonteCarloTrainer(shape,act_func),kernel_radius(kernel_radius),
+    MonteCarloTrainer(shape),kernel_radius(kernel_radius),
     inputs(inputs),outputs(outputs){}
 
 

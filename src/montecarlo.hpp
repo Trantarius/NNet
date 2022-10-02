@@ -18,8 +18,8 @@ public:
     bool log_enabled=false;
     string logpath="log.csv";
 
-    MonteCarloTrainer(vec<size_t> shape,activation_func_t activ):
-        Trainer(shape,activ),threadpool(16){}
+    MonteCarloTrainer(Netshape shape):
+        Trainer(shape),threadpool(16){}
 
     virtual double perform(const NNet& net)=0;
     void generation(vec<NetEntry>& last,vec<NetEntry>& next);

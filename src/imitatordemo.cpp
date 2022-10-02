@@ -23,9 +23,9 @@ namespace ImitatorDemo{
 
     void demo(){
         srand(time(NULL));
-        vec<size_t> netshape(5,5);
+        Netshape netshape(vec<size_t>(5,5),Activation::tanh);
 
-        ImitatorTrainer trainer(netshape,NNet::Activation::dying_sigmoid,target_function);
+        ImitatorTrainer trainer(netshape,target_function);
         trainer.gen_callback=gen_callback;
         trainer.perf_callback=perf_callback;
 

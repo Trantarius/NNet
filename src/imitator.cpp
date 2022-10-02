@@ -9,12 +9,12 @@ dvec randvec(size_t s){
 }
 
 double ImitatorTrainer::perform(const NNet& net){
-    dvec* inputs=dvec::new_array(net.shape[0],samples_per_net);
-    dvec* target=dvec::new_array(net.shape[net.shape.size()-1],samples_per_net);
-    dvec* output=dvec::new_array(net.shape[net.shape.size()-1],samples_per_net);
+    dvec* inputs=dvec::new_array(net.shape.layers[0],samples_per_net);
+    dvec* target=dvec::new_array(net.shape.layers[net.shape.layers.size()-1],samples_per_net);
+    dvec* output=dvec::new_array(net.shape.layers[net.shape.layers.size()-1],samples_per_net);
     double total_err=0;
     for(size_t n=0;n<samples_per_net;n++){
-        inputs[n]=randvec(net.shape[0]);
+        inputs[n]=randvec(net.shape.layers[0]);
         target[n]=target_function(inputs[n]);
         output[n]=net.eval(inputs[n]);
         dvec errv=output[n]-target[n];

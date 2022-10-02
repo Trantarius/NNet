@@ -58,8 +58,8 @@ NetEntry MonteCarloTrainer::train(){
     vec<NetEntry> gen(nets_per_gen);
     vec<NetEntry> alt(nets_per_gen);
     for(size_t n=0;n<nets_per_gen;n++){
-        gen[n]=NetEntry(new NNet(shape,act_func));
-        alt[n]=NetEntry(new NNet(shape,act_func));
+        gen[n]=NetEntry(new NNet(net_shape));
+        alt[n]=NetEntry(new NNet(net_shape));
     }
 
     std::fstream logfile;
