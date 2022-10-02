@@ -2,10 +2,10 @@
 #include <cmath>
 
 ConvolverTrainer::ConvolverTrainer(size_t kernel_radius,vec<size_t> shape,
-                                   activation_func_t act_func,vec<Image>&& inputs,
-                                   vec<Image>&& outputs):
+                                   activation_func_t act_func,bloc<Image> inputs,
+                                   bloc<Image> outputs):
     Trainer(shape,act_func),kernel_radius(kernel_radius),
-    inputs(std::move(inputs)),outputs(std::move(outputs)){}
+    inputs(inputs),outputs(outputs){}
 
 
 int clampi(int x,int low,int high){
@@ -44,7 +44,7 @@ ConvolverTrainer::Image ConvolverTrainer::eval_img(const NNet& net,const Image& 
 
 double ConvolverTrainer::perform(const NNet& net){
     double totalerr=0;
-    for(size_t i=0;i<inputs.size();i++){
+    for(size_t i=0;i<inputs.size;i++){
 
         Image result=eval_img(net,inputs[i]);
 
