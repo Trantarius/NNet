@@ -1,12 +1,13 @@
 #include <iostream>
+#include "montecarlo.hpp"
 #include "net.hpp"
-#include "imitator.hpp"
+#include "imitatordemo.hpp"
 #include "convolver.hpp"
 #include <cmath>
 #include <ctime>
 #include <filesystem>
 #include <cstdlib>
-
+/*
 typedef png::image<png::rgb_pixel> Image;
 using std::filesystem::path;
 using std::filesystem::directory_entry;
@@ -74,10 +75,15 @@ int main(){
     trainer.gen_count=100;
     trainer.samples_per_net=10;
     trainer.nets_per_gen=10000;
-    trainer.mutation_rate=0.01;
+    trainer.mutation_rate=0.05;
     trainer.keep_ratio=10;
     trainer.log_enabled=true;
 
     timer.start();
     trainer.train();
+}
+*/
+
+int main(){
+    ImitatorDemo::demo();
 }
