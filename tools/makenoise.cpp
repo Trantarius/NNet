@@ -44,12 +44,12 @@ Pixel randc(Pixel base,double amount){
 }
 
 
-struct Task{
+struct NoiseTask{
     double noise_amount;
     path infile;
     path outfile;
 
-    Task(double noise_amount,path infile,path outfile):
+    NoiseTask(double noise_amount,path infile,path outfile):
         noise_amount(noise_amount),infile(infile),outfile(outfile){}
 
     void perform(){
@@ -80,7 +80,7 @@ struct Task{
 
 };
 
-void do_all(std::list<Task>* tasks){
+void do_all(std::list<NoiseTask>* tasks){
     while(!tasks->empty()){
         tasks->front().perform_magick();
         tasks->pop_front();
@@ -95,12 +95,12 @@ int main(){
         create_directory(outpath);
     }
 
-    std::list<Task> tasks[thread_count];
+    std::list<NoiseTask> tasks[thread_count];
     int next_list_idx=0;
 
     for(directory_entry entry:directory_iterator(inpath)){
         path outentry=outpath/entry.path().stem().concat(".png");
-        tasks[next_list_idx].push_back(Task(randf(),entry.path(),outentry));
+        tasks[next_list_idx].push_back(NoiseTask(randf(),entry.path(),outentry));
         next_list_idx=(next_list_idx+1)%thread_count;
     }
 
