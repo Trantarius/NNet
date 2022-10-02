@@ -10,23 +10,30 @@ struct NetEntry{
 };
 
 class Trainer{
+    Threadpool threadpool;
 public:
     enum SORT_MODE{ASCENDING,DESCENDING} sort_mode=ASCENDING;
     const vec<size_t> shape;
     const activation_func_t act_func;
 
-    void (*gen_callback)(Trainer* trainer,size_t i,NetEntry entry)=[](Trainer*,size_t,NetEntry){};
-    void (*perf_callback)(Trainer* trainer,size_t i,NetEntry entry)=[](Trainer*,size_t,NetEntry){};
+    typedef void(*callback_t)(Trainer*,size_t,NetEntry);
+
+    callback_t gen_callback=[](Trainer*,size_t,NetEntry){};
+    callback_t perf_callback=[](Trainer*,size_t,NetEntry){};
 
     size_t nets_per_gen=1000;
     double mutation_rate=0.01;
     size_t keep_ratio=10;
+    bool log_enabled=false;
+    string logpath="log.csv";
 
     Trainer(vec<size_t> shape,activation_func_t activ):
-        shape(shape),act_func(activ){}
+        shape(shape),act_func(activ),threadpool(16){}
 
     virtual double perform(const NNet& net)=0;
     void generation(vec<NetEntry>& last,vec<NetEntry>& next);
 
     NetEntry train(size_t gen_count);
+
+    Threadpool* get_threadpool(){return &threadpool;}
 };

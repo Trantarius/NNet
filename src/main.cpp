@@ -25,7 +25,10 @@ void gen_callback(Trainer* trainer,size_t n,NetEntry entry){
 }
 
 void perf_callback(Trainer* trainer,size_t n,NetEntry entry){
+    static std::mutex mtx;
+    mtx.lock();
     print_loadbar((double)n/trainer->nets_per_gen);
+    mtx.unlock();
 }
 
 
@@ -67,10 +70,11 @@ int main(){
     trainer.gen_callback=gen_callback;
     trainer.perf_callback=perf_callback;
 
-    trainer.samples_per_net=5;
-    trainer.nets_per_gen=100;
+    trainer.samples_per_net=10;
+    trainer.nets_per_gen=1000;
     trainer.mutation_rate=0.01;
     trainer.keep_ratio=10;
+    trainer.log_enabled=true;
 
     timer.start();
     trainer.train(100);

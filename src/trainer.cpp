@@ -1,4 +1,5 @@
 #include "trainer.hpp"
+#include <fstream>
 
 double randf(){
     return (double)rand()/RAND_MAX;
@@ -19,15 +20,34 @@ bool sort_descending_comp(const NetEntry& a,const NetEntry& b){
     return b.performance<a.performance;
 }
 
+struct NetTask:public Task{
+    size_t n=-1;
+    Trainer* trainer;
+    vec<NetEntry>* last;
+    vec<NetEntry>* next;
+    void perform(){
+        (*next)[n].net->copy(*(*last)[biased_idx(n,trainer->keep_ratio,trainer->nets_per_gen)].net);
+        (*next)[n].net->mutate(trainer->mutation_rate);
+        (*next)[n].performance=trainer->perform(*(*next)[n].net);
+        trainer->perf_callback(trainer,trainer->nets_per_gen-trainer->get_threadpool()->tasks_left(),(*next)[n]);
+    }
+    NetTask(vec<NetEntry>* last,vec<NetEntry>* next,Trainer* trainer,size_t n):
+        last(last),next(next),trainer(trainer),n(n){}
+};
+
 void Trainer::generation(vec<NetEntry>& last,vec<NetEntry>& next){
     for(size_t n=0;n<nets_per_gen;n++){
+        threadpool.push(new NetTask(&last,&next,this,n));
+        /*
         next[n].net->copy(*last[biased_idx(n,keep_ratio,nets_per_gen)].net);
         next[n].net->mutate(mutation_rate);
         next[n].performance=perform(*next[n].net);
         perf_callback(this,n,next[n]);
+        */
     }
+    threadpool.finish();
 
-    std::sort(&next,&next+next.size(),(
+    std::sort(next.ptr(),next.ptr()+next.size(),(
         sort_mode==SORT_MODE::ASCENDING?
             sort_ascending_comp:
             sort_descending_comp
@@ -41,10 +61,25 @@ NetEntry Trainer::train(size_t gen_count){
         gen[n]=NetEntry(new NNet(shape,act_func));
         alt[n]=NetEntry(new NNet(shape,act_func));
     }
+
+    std::fstream logfile;
+    if(log_enabled){
+        logfile.open(logpath,std::fstream::out);
+    }
+
     for(size_t n=0;n<gen_count;n++){
         generation(gen,alt);
         swap(gen,alt);
         gen_callback(this,n,gen[0]);
+        if(log_enabled){
+            for(size_t l=0;l<gen.size();l++){
+                logfile<<gen[l].performance<<',';
+            }
+            logfile<<std::endl;
+        }
+    }
+    if(log_enabled){
+        logfile.close();
     }
     NetEntry ret=NetEntry(gen[0].net->clone(),gen[0].performance);
     for(size_t n=0;n<gen.size();n++){
