@@ -7,6 +7,7 @@ class ConvolverTrainer:public Trainer{
 public:
     typedef png::image<png::rgb_pixel> Image;
     const size_t kernel_radius;
+    size_t samples_per_net=10;
     const bloc<Image> inputs;
     const bloc<Image> outputs;
     virtual double perform(const NNet& net);

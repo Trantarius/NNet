@@ -24,6 +24,7 @@ void Trainer::generation(vec<NetEntry>& last,vec<NetEntry>& next){
         next[n].net->copy(*last[biased_idx(n,keep_ratio,nets_per_gen)].net);
         next[n].net->mutate(mutation_rate);
         next[n].performance=perform(*next[n].net);
+        perf_callback(this,n,next[n]);
     }
 
     std::sort(&next,&next+next.size(),(
@@ -43,7 +44,7 @@ NetEntry Trainer::train(size_t gen_count){
     for(size_t n=0;n<gen_count;n++){
         generation(gen,alt);
         swap(gen,alt);
-        gen_callback(gen[0]);
+        gen_callback(this,n,gen[0]);
     }
     NetEntry ret=NetEntry(gen[0].net->clone(),gen[0].performance);
     for(size_t n=0;n<gen.size();n++){

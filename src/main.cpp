@@ -18,25 +18,14 @@ dvec target_function(dvec in){
 
 Timer timer;
 
-void callback(NetEntry entry){
+void gen_callback(Trainer* trainer,size_t n,NetEntry entry){
     double t=timer.stop();
-    print(Timer::format(t),"\t",entry.performance);
+    printw(16,Timer::format(t),entry.performance," "," "," "," ");
     timer.start();
 }
 
-
-void print_loadbar(double completion){
-    string out="\r[";
-    int total_length=64;
-    int filled=total_length*completion;
-    for(int n=0;n<filled;n++){
-        out+='#';
-    }
-    for(int n=0;n<total_length-filled;n++){
-        out+=' ';
-    }
-    out+="]";
-    std::cout<<out;
+void perf_callback(Trainer* trainer,size_t n,NetEntry entry){
+    print_loadbar((double)n/trainer->nets_per_gen);
 }
 
 
@@ -50,30 +39,37 @@ bloc<Image> load_images(path dir){
     }
     bloc<Image> images(file_count);
     size_t idx=0;
+    print("reading ",dir.string());
     for(directory_entry entry:directory_iterator(dir)){
         try{
-        if(entry.path().extension()!=string(".png")){
-            continue;
-        }
-        //system(("magick "+entry.path().string()+" -strip "+entry.path().string()).c_str());
-        images[idx++].read(entry.path());
-        print_loadbar(idx/(double)file_count);
+            if(entry.path().extension()!=string(".png")){
+                continue;
+            }
+            images[idx++].read(entry.path());
+            print_loadbar(idx/(double)file_count);
         }catch(png::error e){
-            print("file: ",entry.path().string());
+            print("\nerror: ",entry.path().string());
+            exit(1);
         }
     }
+    std::cout<<std::endl;
     return images;
 }
 
 int main(){
     srand(time(NULL));
-    vec<size_t> netshape(9,7,5,3);
+    vec<size_t> netshape(9,3);
 
     bloc<Image> inputs=load_images("noiseimages");
     bloc<Image> outputs=load_images("images");
 
-    ConvolverTrainer trainer(1,netshape,NNet::Activation::dying_sigmoid,inputs,outputs);
-    trainer.gen_callback=callback;
+    ConvolverTrainer trainer(1,netshape,NNet::Activation::logistic,inputs,outputs);
+    trainer.gen_callback=gen_callback;
+    trainer.perf_callback=perf_callback;
+
+    trainer.samples_per_net=5;
+    trainer.nets_per_gen=100;
+    trainer.mutation_rate=0.01;
     trainer.keep_ratio=10;
 
     timer.start();

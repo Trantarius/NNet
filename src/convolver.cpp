@@ -18,10 +18,10 @@ double clampf(double x,double low,double high){
 
 ConvolverTrainer::Image ConvolverTrainer::eval_img(const NNet& net,const Image& input){
     Image result(input.get_width(),input.get_height());
+    dvec invec((kernel_radius*2+1)*(kernel_radius*2+1)*3);
     for(int x=0;x<result.get_width();x++){
         for(int y=0;y<result.get_height();y++){
 
-            dvec invec((kernel_radius*2+1)*(kernel_radius*2+1)*3);
             int idx=0;
             for(int dx=-kernel_radius;dx<=kernel_radius;dx++){
                 for(int dy=-kernel_radius;dy<=kernel_radius;dy++){
@@ -44,7 +44,8 @@ ConvolverTrainer::Image ConvolverTrainer::eval_img(const NNet& net,const Image& 
 
 double ConvolverTrainer::perform(const NNet& net){
     double totalerr=0;
-    for(size_t i=0;i<inputs.size;i++){
+    for(size_t s=0;s<samples_per_net;s++){
+        size_t i=rand()%inputs.size;
 
         Image result=eval_img(net,inputs[i]);
 
@@ -59,5 +60,5 @@ double ConvolverTrainer::perform(const NNet& net){
         }
         totalerr+=(double)imgerr/(result.get_width()*result.get_height());
     }
-    return totalerr;
+    return totalerr/(double)samples_per_net;
 }

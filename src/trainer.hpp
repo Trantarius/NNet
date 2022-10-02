@@ -15,9 +15,10 @@ public:
     const vec<size_t> shape;
     const activation_func_t act_func;
 
-    void (*gen_callback)(NetEntry entry)=[](NetEntry){};
+    void (*gen_callback)(Trainer* trainer,size_t i,NetEntry entry)=[](Trainer*,size_t,NetEntry){};
+    void (*perf_callback)(Trainer* trainer,size_t i,NetEntry entry)=[](Trainer*,size_t,NetEntry){};
 
-    size_t nets_per_gen=10000;
+    size_t nets_per_gen=1000;
     double mutation_rate=0.01;
     size_t keep_ratio=10;
 
