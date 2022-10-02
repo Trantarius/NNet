@@ -61,7 +61,7 @@ bloc<Image> load_images(path dir){
 
 int main(){
     srand(time(NULL));
-    vec<size_t> netshape(9,3);
+    vec<size_t> netshape(27,3);
 
     bloc<Image> inputs=load_images("noiseimages");
     bloc<Image> outputs=load_images("images");
@@ -72,7 +72,7 @@ int main(){
 
     trainer.samples_per_net=10;
     trainer.nets_per_gen=1000;
-    trainer.mutation_rate=0.01;
+    trainer.mutation_rate=0.1;
     trainer.keep_ratio=10;
     trainer.log_enabled=true;
 
