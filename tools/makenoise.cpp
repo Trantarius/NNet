@@ -5,13 +5,19 @@
 #include <thread>
 #include <list>
 
+/*
+ * image preprocessor.
+ * converts jpg files to png, and saves another copy with noise added
+ * designed to be used with images from https://cocodataset.org/#download
+ */
+
 using namespace std::filesystem;
 using Image=png::image<png::rgb_pixel>;
 
 const path orig_dir="val2017";
 const path clean_dir="images";
 const path noise_dir="noiseimages";
-const size_t thread_count=8;
+const size_t thread_count=16;
 
 struct ImageTask:public Task{
     double noise_amount;
