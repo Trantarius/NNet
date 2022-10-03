@@ -22,8 +22,12 @@ NNet::NNet(Netshape shape):shape(shape){
 NNet::NNet(vec<size_t> shape,ActivationFunction actfunc):NNet(Netshape(shape,actfunc)){}
 
 NNet::~NNet(){
-    delete [] weights;
-    delete [] biases;
+    if(weights!=nullptr){
+        delete [] weights;
+    }
+    if(biases!=nullptr){
+        delete [] biases;
+    }
 }
 
 void NNet::mutate(double sd){
@@ -40,6 +44,7 @@ void NNet::mutate(double sd){
         }
 
     }
+    performance=NAN;
 }
 
 dvec NNet::eval(dvec v) const {

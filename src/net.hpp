@@ -24,10 +24,12 @@ struct Netshape{
 };
 
 
-struct NNet{
+class NNet{
+public:
+    double performance=NAN;
     const Netshape shape;
-    dmat* weights;
-    dvec* biases;
+    dmat* weights=nullptr;
+    dvec* biases=nullptr;
 
     NNet(Netshape shape);
     NNet(vec<size_t> shape,ActivationFunction actfunc);

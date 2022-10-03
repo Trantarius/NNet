@@ -3,11 +3,6 @@
 #include <cmath>
 #include <algorithm>
 
-struct NetEntry{
-    NNet* net;
-    double performance=(double)(uint)(-1);
-    NetEntry(NNet* net=NULL,double performance=(double)(uint)(-1)):net(net),performance(performance){}
-};
 
 class Trainer{
 public:
@@ -16,5 +11,5 @@ public:
 
     Trainer(Netshape shape):net_shape(shape){}
 
-    virtual NetEntry train()=0;
+    virtual NNet* train()=0;
 };

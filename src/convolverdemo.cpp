@@ -2,19 +2,15 @@
 
 namespace ConvolverDemo{
 
-    dvec target_function(dvec in){
-        return dvec(sin(in[1]),cos(in[0]),sin(in[4]),cos(in[2]),sin(in[3]));
-    }
-
     Timer timer;
 
-    void gen_callback(MonteCarloTrainer* trainer,size_t n,NetEntry entry){
+    void gen_callback(MonteCarloTrainer* trainer,size_t n,NNet* net){
         double t=timer.stop();
-        printw(16,Timer::format(t),entry.performance," "," "," "," ");
+        printw(16,Timer::format(t),net->performance," "," "," "," ");
         timer.start();
     }
 
-    void perf_callback(MonteCarloTrainer* trainer,size_t n,NetEntry entry){
+    void perf_callback(MonteCarloTrainer* trainer,size_t n,NNet* net){
         static std::mutex mtx;
         mtx.lock();
         print_loadbar((double)n/trainer->nets_per_gen);

@@ -12,14 +12,14 @@ class MonteCarloTrainer:public Trainer{
 public:
     enum SORT_MODE{ASCENDING,DESCENDING} sort_mode=ASCENDING;
 
-    typedef void(*callback_t)(MonteCarloTrainer*,size_t,NetEntry);
+    typedef void(*callback_t)(MonteCarloTrainer*,size_t,NNet*);
 
     //called whenever a generation is completed
     //params are this trainer, index of the generation, and the best network this generation
-    callback_t gen_callback=[](MonteCarloTrainer*,size_t,NetEntry){};
+    callback_t gen_callback=[](MonteCarloTrainer*,size_t,NNet*){};
     //called whenever a network has its performance calculated
     //params are this trainer, number of perfs completed this generation, and the newly calculated NetEntry
-    callback_t perf_callback=[](MonteCarloTrainer*,size_t,NetEntry){};
+    callback_t perf_callback=[](MonteCarloTrainer*,size_t,NNet*){};
 
     //number of generations to train when train() is called.
     size_t gen_count=100;
@@ -43,9 +43,9 @@ public:
     virtual double perform(const NNet& net)=0;
 
     //takes the networks in 'last' and performs 1 generation of training, putting the results in 'next'
-    void generation(vec<NetEntry>& last,vec<NetEntry>& next);
+    void generation(vec<NNet*>& last,vec<NNet*>& next);
 
-    NetEntry train();
+    NNet* train();
 
     Threadpool* get_threadpool(){return &threadpool;}
 };

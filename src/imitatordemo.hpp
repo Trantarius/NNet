@@ -10,9 +10,9 @@ namespace ImitatorDemo{
 
     dvec target_function(dvec in);
 
-    void gen_callback(MonteCarloTrainer* trainer,size_t n,NetEntry entry);
+    void gen_callback(MonteCarloTrainer* trainer,size_t n,NNet* net);
 
-    void perf_callback(MonteCarloTrainer* trainer,size_t n,NetEntry entry);
+    void perf_callback(MonteCarloTrainer* trainer,size_t n,NNet* net);
 
     void demo();
 

@@ -11,11 +11,9 @@ namespace ConvolverDemo{
     typedef std::filesystem::directory_entry directory_entry;
     typedef std::filesystem::directory_iterator directory_iterator;
 
-    dvec target_function(dvec in);
+    void gen_callback(MonteCarloTrainer* trainer,size_t n,NNet* entry);
 
-    void gen_callback(MonteCarloTrainer* trainer,size_t n,NetEntry entry);
-
-    void perf_callback(MonteCarloTrainer* trainer,size_t n,NetEntry entry);
+    void perf_callback(MonteCarloTrainer* trainer,size_t n,NNet* entry);
 
 
     bloc<Image> load_images(path dir);
