@@ -1,7 +1,7 @@
  
-images/*
-noiseimages/*
+images
+noiseimages
+val2017
 exe
 makenoise
-rawifier
 log.csv
