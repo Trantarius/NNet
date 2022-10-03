@@ -11,6 +11,7 @@ struct NetEntry{
 
 class Trainer{
 public:
+    //determines the parameters of the network(s) to be trained
     const Netshape net_shape;
 
     Trainer(Netshape shape):net_shape(shape){}
