@@ -1,15 +1,24 @@
 #include "convolverdemo.hpp"
 
+/*
+ * Creates an image denoiser from a set of training images, and versions of those images with
+ * noise already added.
+ * Records progress in log.csv.
+ * Doesn't really work, really just to compare to alternatives at this point
+ */
 namespace ConvolverDemo{
 
     Timer timer;
 
+    //print the time it took to train the generation, and the best performance in that generation
+    //also clears the loadbar
     void gen_callback(MonteCarloTrainer* trainer,size_t n,NNet* net){
         double t=timer.stop();
         printw(16,Timer::format(t),net->performance," "," "," "," ");
         timer.start();
     }
 
+    //print a loadbar for how far along this generation we are
     void perf_callback(MonteCarloTrainer* trainer,size_t n,NNet* net){
         static std::mutex mtx;
         mtx.lock();
@@ -17,7 +26,8 @@ namespace ConvolverDemo{
         mtx.unlock();
     }
 
-
+    //load a bunch of images. ignores anything that doesn't end in ".png".
+    //very slow, prints a loadbar to show progress
     bloc<Image> load_images(path dir){
         size_t file_count=0;
         for(directory_entry entry:directory_iterator(dir)){
@@ -51,6 +61,13 @@ namespace ConvolverDemo{
 
         bloc<Image> inputs=load_images("noiseimages");
         bloc<Image> outputs=load_images("images");
+
+        for(int n=0;n<inputs.size;n++){
+            if(inputs[n].get_width()!=outputs[n].get_width()||inputs[n].get_height()!=outputs[n].get_height()){
+                print("woah");
+                exit(0);
+            }
+        }
 
         ConvolverTrainer trainer(netshape,1,inputs,outputs);
         trainer.gen_callback=gen_callback;

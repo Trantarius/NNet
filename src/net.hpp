@@ -2,6 +2,8 @@
 #include "util.hpp"
 #include <cmath>
 
+//bundles an activation function with its derivative, which can be used for backpropogation
+//see namespace Activation below for examples
 struct ActivationFunction{
     typedef double(*funcptr_t)(double);
     const funcptr_t activate;
@@ -12,7 +14,10 @@ struct ActivationFunction{
         activate(act),derivative(der){}
 };
 
+//determines the shape (ie, number of layers and size of each layer) and activation
+//function of a network, for easy copyability
 struct Netshape{
+    //size of each layer. size of this vector determines the number of layers.
     vec<size_t> layers;
     ActivationFunction actfunc;
 
@@ -23,18 +28,35 @@ struct Netshape{
         layers(layers),actfunc(actfunc){}
 };
 
-
+/*
+ * A single instance of a neural network. This is a fairly standard feed-forward network.
+ * Each 'neuron' creates its output as a weighted sum of the outputs of the previous layer; this
+ * sum is then passed through an activation function. The first layer is a perceptron layer, ie
+ * it just outputs the data input to the network (this layer's size is the size of the input
+ * data, which is static). There are no 'neuron' objects, instead whole layers are collected as
+ * a matrix of weights and a vector of biases; outputs are calculated all at once for the whole
+ * layer.
+ */
 class NNet{
 public:
+    //last calculated performance metric for this network. will be NAN if and only if the
+    //performance has not been calculated for this network.
     double performance=NAN;
     const Netshape shape;
+
+    //arrays of weights and biases for the corresponding layers. since the first layer is
+    //a perceptron layer, there are shape.layers.size()-1 matrices and vectors
     dmat* weights=nullptr;
     dvec* biases=nullptr;
 
     NNet(Netshape shape);
     NNet(vec<size_t> shape,ActivationFunction actfunc);
     ~NNet();
+
+    //evaluates the network on a certain input (AKA, the whole point of the net)
     dvec eval(dvec in) const;
+    //modifies every weight and bias by a normally distributed random amount, with given
+    //standard deviation
     void mutate(double std_dev);
     NNet* clone() const;
     void copy(NNet& b);

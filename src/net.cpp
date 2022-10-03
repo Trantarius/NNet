@@ -2,6 +2,8 @@
 #include "net.hpp"
 #include <cmath>
 
+//approximation of a normally distributed random number
+//see https://en.wikipedia.org/wiki/Irwin-Hall_distribution#Approximating_a_Normal_distribution
 double ih_rand(){
     double ret=0;
     for(int n=0;n<12;n++){
@@ -14,6 +16,7 @@ NNet::NNet(Netshape shape):shape(shape){
     weights=new dmat[shape.layers.size()-1];
     biases=new dvec[shape.layers.size()-1];
 
+    //start off with weights+biases that pass through some or all of the last layers output
     for(size_t layer=0;layer<shape.layers.size()-1;layer++){
         weights[layer]=dmat::identity(shape.layers[layer+1],shape.layers[layer]);
         biases[layer]=dvec(shape.layers[layer+1]).fill(0);
@@ -22,12 +25,8 @@ NNet::NNet(Netshape shape):shape(shape){
 NNet::NNet(vec<size_t> shape,ActivationFunction actfunc):NNet(Netshape(shape,actfunc)){}
 
 NNet::~NNet(){
-    if(weights!=nullptr){
-        delete [] weights;
-    }
-    if(biases!=nullptr){
-        delete [] biases;
-    }
+    delete [] weights;
+    delete [] biases;
 }
 
 void NNet::mutate(double sd){
@@ -44,11 +43,13 @@ void NNet::mutate(double sd){
         }
 
     }
+    //the network has changed, so the performance value is no longer valid
     performance=NAN;
 }
 
 dvec NNet::eval(dvec v) const {
     for(size_t layer=0;layer<shape.layers.size()-1;layer++){
+        //go from output of layer i to output of layer i+1
         v = weights[layer]*v + biases[layer];
         for(size_t n=0;n<v.size();n++){
             v[n]=shape.actfunc.activate(v[n]);

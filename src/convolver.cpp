@@ -17,15 +17,25 @@ double clampf(double x,double low,double high){
 
 ConvolverTrainer::Image ConvolverTrainer::eval_img(const NNet& net,const Image& input){
     Image result(input.get_width(),input.get_height());
-    dvec invec((kernel_radius*2+1)*(kernel_radius*2+1)*3);
+
+    //for each pixel
     for(int x=0;x<result.get_width();x++){
         for(int y=0;y<result.get_height();y++){
 
+            //evaluate the result for this pixel.
+            //network will operate on the range [0,1); image is in the range [0,256)
+
+            //a temporary copy of the local area in a format that can be used as network input
+            dvec invec((kernel_radius*2+1)*(kernel_radius*2+1)*3);
             int idx=0;
+            //for every nearby pixel (ie within kernel)
             for(int dx=-kernel_radius;dx<=kernel_radius;dx++){
                 for(int dy=-kernel_radius;dy<=kernel_radius;dy++){
+
+                    //if pixel is out of bounds, replace with nearest pixel inside bounds
                     int tx=clampi(x+dx,0,result.get_width());
                     int ty=clampi(y+dy,0,result.get_height());
+
                     invec[idx++]=input[ty][tx].red   /256.0;
                     invec[idx++]=input[ty][tx].green /256.0;
                     invec[idx++]=input[ty][tx].blue  /256.0;
@@ -44,10 +54,12 @@ ConvolverTrainer::Image ConvolverTrainer::eval_img(const NNet& net,const Image& 
 double ConvolverTrainer::perform(const NNet& net){
     double totalerr=0;
     for(size_t s=0;s<samples_per_net;s++){
+        //pick random image to sample
         size_t i=rand()%inputs.size;
 
         Image result=eval_img(net,inputs[i]);
 
+        //find the average pixel error in this image (as distance squared in RGB-space)
         ulong imgerr=0;
         for(int x=0;x<result.get_width();x++){
             for(int y=0;y<result.get_height();y++){
@@ -59,5 +71,6 @@ double ConvolverTrainer::perform(const NNet& net){
         }
         totalerr+=(double)imgerr/(result.get_width()*result.get_height());
     }
+    //return average of the average errors (prevents larger images from having a more significant effect)
     return totalerr/(double)samples_per_net;
 }

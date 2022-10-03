@@ -5,6 +5,7 @@ double randf(){
     return (double)rand()/RAND_MAX;
 }
 
+//takes indices evenly distibuted in [0,max] and returns indices biased towards 0 in [0,max]
 size_t biased_idx(size_t base,size_t bias_strength,size_t max){
     //return base/bias_strength;
     double a=bias_strength;
@@ -20,14 +21,19 @@ bool sort_descending_comp(NNet*const& a,NNet*const& b){
     return b->performance<a->performance;
 }
 
+//used to create one network in a generation in a multithreaded manner
 struct NetTask:public Task{
     size_t n=-1;
     MonteCarloTrainer* trainer;
     vec<NNet*>* last;
     vec<NNet*>* next;
     void perform(){
+        //pick a network from the last generation, biased towards the ones with better
+        //performance. that network is this ones "parent". copy it.
         (*next)[n]->copy(*(*last)[biased_idx(n,trainer->keep_ratio,trainer->nets_per_gen)]);
+        //change a little
         (*next)[n]->mutate(trainer->mutation_rate);
+        //test the new network
         (*next)[n]->performance=trainer->perform(*(*next)[n]);
         trainer->perf_callback(trainer,trainer->nets_per_gen-trainer->get_threadpool()->tasks_left(),(*next)[n]);
     }
@@ -37,10 +43,13 @@ struct NetTask:public Task{
 
 void MonteCarloTrainer::generation(vec<NNet*>& last,vec<NNet*>& next){
     for(size_t n=0;n<nets_per_gen;n++){
+        //makes one network in the next generation
+        //you could put the contents of NetTask::perform() here to do it single threaded
         threadpool.push(new NetTask(&last,&next,this,n));
     }
     threadpool.finish();
 
+    //sort by performance so that better networks are at lower indices, best at 0
     std::sort(next.ptr(),next.ptr()+next.size(),(
         sort_mode==SORT_MODE::ASCENDING?
         sort_ascending_comp:
@@ -49,6 +58,9 @@ void MonteCarloTrainer::generation(vec<NNet*>& last,vec<NNet*>& next){
 }
 
 NNet* MonteCarloTrainer::train(){
+
+    //make 2 generations of networks. we will train back and forth between these generations to
+    //avoid reallocating a whole generation of nets.
     vec<NNet*> gen(nets_per_gen);
     vec<NNet*> alt(nets_per_gen);
     for(size_t n=0;n<nets_per_gen;n++){
@@ -75,6 +87,8 @@ NNet* MonteCarloTrainer::train(){
     if(log_enabled){
         logfile.close();
     }
+
+    //delete all networks, except the best one, which is returned
     NNet* ret=gen[0];
     delete alt[0];
     for(size_t n=1;n<gen.size();n++){
