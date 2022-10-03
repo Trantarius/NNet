@@ -15,7 +15,10 @@ struct ActivationFunction{
 struct Netshape{
     vec<size_t> layers;
     ActivationFunction actfunc;
-    Netshape(const Netshape& b):layers(b.layers),actfunc(b.actfunc){}
+
+    Netshape(const Netshape& b):
+        layers(b.layers),actfunc(b.actfunc){}
+
     Netshape(vec<size_t> layers,ActivationFunction actfunc):
         layers(layers),actfunc(actfunc){}
 };
@@ -37,7 +40,6 @@ struct NNet{
 
 //Some common activation functions; see https://en.wikipedia.org/wiki/Activation_function
 namespace Activation{
-    const double E=2.71828182845904523536;
     const ActivationFunction sigmoid=ActivationFunction(
         [](double x)->double{
             return 1/(exp(-x)+1);
@@ -83,6 +85,15 @@ namespace Activation{
         [](double x)->double{
             double ex=exp(-x);
             return (1+ex+x*ex)/((1+ex)*(1+ex));
+        }
+    );
+    //I just made this one up
+    const ActivationFunction wave=ActivationFunction(
+        [](double x)->double{
+            return x/exp(x*x/5.43656365692);
+        },
+        [](double x)->double{
+            return (1-x*x/2.7182818284)/exp(x*x/5.43656365692);
         }
     );
 }
