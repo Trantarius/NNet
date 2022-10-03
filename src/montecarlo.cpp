@@ -40,23 +40,6 @@ struct NetTask:public Task{
     NetTask(vec<NNet*>* last,vec<NNet*>* next,MonteCarloTrainer* trainer,size_t n):
     last(last),next(next),trainer(trainer),n(n){}
 };
-/*
-void MonteCarloTrainer::generation(vec<NNet*>& last,vec<NNet*>& next){
-    for(size_t n=0;n<nets_per_gen;n++){
-        //makes one network in the next generation
-        //you could put the contents of NetTask::perform() here to do it single threaded
-        threadpool.push(new NetTask(&last,&next,this,n));
-    }
-    threadpool.finish();
-
-    //sort by performance so that better networks are at lower indices, best at 0
-    std::sort(next.ptr(),next.ptr()+next.size(),(
-        sort_mode==SORT_MODE::ASCENDING?
-        sort_ascending_comp:
-        sort_descending_comp
-    ));
-}
-*/
 NNet* MonteCarloTrainer::train(){
 
     //make 2 generations of networks. we will train back and forth between these generations to

@@ -37,8 +37,7 @@ struct Netshape{
  * a matrix of weights and a vector of biases; outputs are calculated all at once for the whole
  * layer.
  */
-class NNet{
-public:
+struct NNet{
     //last calculated performance metric for this network. will be NAN if and only if the
     //performance has not been calculated for this network.
     double performance=NAN;

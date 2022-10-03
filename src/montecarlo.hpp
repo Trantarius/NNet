@@ -42,9 +42,6 @@ public:
 
     virtual double perform(const NNet& net)=0;
 
-    //takes the networks in 'last' and performs 1 generation of training, putting the results in 'next'
-    //void generation(vec<NNet*>& last,vec<NNet*>& next);
-
     NNet* train();
 
     Threadpool* get_threadpool(){return &threadpool;}
