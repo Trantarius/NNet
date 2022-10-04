@@ -15,5 +15,5 @@ namespace ImitatorDemo{
     void perf_callback(MonteCarloTrainer* trainer,size_t n,NNet* net);
 
     void demo();
-
+    void demo_backprop();
 };

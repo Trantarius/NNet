@@ -1,6 +1,7 @@
 #pragma once
 #include "net.hpp"
 #include "montecarlo.hpp"
+#include "backprop.hpp"
 
 /*
  * Trains a network to imitate a known function. Always trains on the range [0,1).
@@ -17,4 +18,17 @@ public:
 
     ImitatorTrainer(Netshape shape,dvec(*target_func)(dvec)):
         MonteCarloTrainer(shape),target_function(target_func){}
+};
+
+class ImitatorBackPropTrainer:public BackPropTrainer{
+public:
+    //number of randomly generated inputs to test each network on
+    size_t samples_per_net=100;
+    //the function to be imitated. must have same input/output size as the network
+    dvec (*target_function)(dvec);
+    virtual double perform(const NNet& net);
+    virtual Sample sample(size_t n);
+
+    ImitatorBackPropTrainer(Netshape shape,dvec(*target_func)(dvec)):
+    BackPropTrainer(shape),target_function(target_func){}
 };

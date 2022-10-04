@@ -48,4 +48,33 @@ namespace ImitatorDemo{
         trainer.train();
     }
 
+    //print the time it took to train the generation, and the best performance in that generation
+    //also clears the loadbar
+    void gen_callback_backprop(BackPropTrainer* trainer,size_t n,NNet* net){
+        double t=timer.stop();
+        double perf=((ImitatorBackPropTrainer*)trainer)->perform(*net);
+        static double lastperf;
+        double pdiff=perf-lastperf;
+        printw(16,Timer::format(t),perf,(
+            (pdiff>0?"+ ":"- ")+tostr(fabs(pdiff))
+        ));
+        lastperf=perf;
+        timer.start();
+    }
+
+    void demo_backprop(){
+        srand(time(NULL));
+        Netshape netshape(vec<size_t>(5,5),Activation::tanh);
+
+        ImitatorBackPropTrainer trainer(netshape,target_function);
+        trainer.gen_callback=gen_callback_backprop;
+
+        trainer.gen_count=100;
+        trainer.samples_per_net=100000;
+        trainer.learn_rate=0.1;
+
+        timer.start();
+        trainer.train();
+    }
+
 };

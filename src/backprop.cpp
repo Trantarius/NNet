@@ -19,6 +19,8 @@ NNet backprop(NNet& net,dvec in,dvec expected){
                                  net.shape.actfunc.activate);
     }
 
+    //calculate "delta" for each neuron. This is used to calculate the gradient later.
+    //you can consider this to be d(error)/d(neuron)
     dvec* neuron_deltas=new dvec[net.shape.layers.size()-1];
     neuron_deltas[last_layer_idx]=neuron_outputs[last_layer_idx]-expected;
     neuron_deltas[last_layer_idx]*=mapvec(neuron_outputs[last_layer_idx],
@@ -29,6 +31,7 @@ NNet backprop(NNet& net,dvec in,dvec expected){
         neuron_deltas[l]*=mapvec(neuron_outputs[l],net.shape.actfunc.derivative);
     }
 
+    //calculate the gradient from deltas.
     NNet ret(net.shape);
     for(int n=0;n<net.shape.layers[1];n++){
         for(int m=0;m<net.shape.layers[0];m++){
@@ -45,4 +48,23 @@ NNet backprop(NNet& net,dvec in,dvec expected){
     std::swap(neuron_deltas,ret.biases);
     delete [] neuron_deltas;
     return ret;
+}
+
+void net_add(NNet* net_a,const NNet* net_b,double scalar){
+    for(size_t l=0;l<net_a->shape.layers.size()-1;l++){
+        net_a->weights[l]=net_a->weights[l]+net_b->weights[l]*scalar;
+        net_a->biases[l]+=net_b->biases[l]*scalar;
+    }
+}
+
+NNet* BackPropTrainer::train(){
+    NNet* net=new NNet(net_shape);
+    net->mutate(1.0);
+    for(size_t g=0;g<gen_count;g++){
+        Sample next=sample(g);
+        NNet gradient=backprop(*net,next.first,next.second);
+        net_add(net,&gradient,-learn_rate);
+        gen_callback(this,g,net);
+    }
+    return net;
 }

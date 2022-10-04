@@ -31,5 +31,36 @@ double ImitatorTrainer::perform(const NNet& net){
     dvec::delete_array(inputs);
     dvec::delete_array(target);
     dvec::delete_array(output);
-    return total_err;
+    return total_err/samples_per_net;
+}
+
+double ImitatorBackPropTrainer::perform(const NNet& net){
+
+    //prepare space in memory
+    dvec* inputs=dvec::new_array(net.shape.layers[0],samples_per_net);
+    dvec* target=dvec::new_array(net.shape.layers[net.shape.layers.size()-1],samples_per_net);
+    dvec* output=dvec::new_array(net.shape.layers[net.shape.layers.size()-1],samples_per_net);
+
+    double total_err=0;
+    for(size_t n=0;n<samples_per_net;n++){
+
+        inputs[n]=randvec(net.shape.layers[0]);
+        target[n]=target_function(inputs[n]);
+        output[n]=net.eval(inputs[n]);
+
+        //represent error as distance squared b/w output and target
+        dvec errv=output[n]-target[n];
+        total_err+=dot(errv,errv);
+
+    }
+    dvec::delete_array(inputs);
+    dvec::delete_array(target);
+    dvec::delete_array(output);
+    return total_err/samples_per_net;
+}
+
+BackPropTrainer::Sample ImitatorBackPropTrainer::sample(size_t n){
+    dvec in=randvec(net_shape.layers[0]);
+    dvec out=target_function(in);
+    return Sample(in,out);
 }
