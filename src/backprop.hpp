@@ -8,6 +8,7 @@ struct BackPropTrainer:public Trainer{
     typedef std::pair<dvec,dvec> Sample;
     typedef void(*callback_t)(BackPropTrainer*,size_t,NNet*);
 
+    size_t samples_per_gen=100;
     size_t gen_count=100;
     double learn_rate=0.01;
 

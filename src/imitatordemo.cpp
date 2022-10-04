@@ -64,13 +64,14 @@ namespace ImitatorDemo{
 
     void demo_backprop(){
         srand(time(NULL));
-        Netshape netshape(vec<size_t>(5,5),Activation::tanh);
+        Netshape netshape(vec<size_t>(5,5,5),Activation::tanh);
 
         ImitatorBackPropTrainer trainer(netshape,target_function);
         trainer.gen_callback=gen_callback_backprop;
 
-        trainer.gen_count=100;
-        trainer.samples_per_net=100000;
+        trainer.gen_count=1000;
+        trainer.samples_per_net=1000;
+        trainer.samples_per_gen=1000;
         trainer.learn_rate=0.1;
 
         timer.start();

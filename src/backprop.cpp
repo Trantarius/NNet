@@ -63,6 +63,11 @@ NNet* BackPropTrainer::train(){
     for(size_t g=0;g<gen_count;g++){
         Sample next=sample(g);
         NNet gradient=backprop(*net,next.first,next.second);
+        for(size_t s=0;s<samples_per_gen-1;s++){
+            next=sample(g);
+            NNet grad2=backprop(*net,next.first,next.second);
+            net_add(&gradient,&grad2,1.0/samples_per_gen);
+        }
         net_add(net,&gradient,-learn_rate);
         gen_callback(this,g,net);
     }
