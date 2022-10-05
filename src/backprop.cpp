@@ -47,6 +47,7 @@ NNet* backprop(const NNet& net,dvec in,dvec expected){
     }
     swap(neuron_deltas,ret->biases);
     neuron_deltas.destroy();
+    neuron_outputs.destroy();
     return ret;
 }
 

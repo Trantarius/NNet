@@ -107,7 +107,8 @@ namespace ConvolverDemo{
         trainer.img_callback=img_callback_bp;
 
         trainer.gen_count=100;
-        trainer.samples_per_net=10;
+        trainer.samples_per_net=100;
+        trainer.samples_per_gen=100;
         trainer.learn_rate=0.05;
 
         timer.start();
