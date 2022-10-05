@@ -6,7 +6,10 @@
  * see https://machinelearningmastery.com/implement-backpropagation-algorithm-scratch-python/
  * also see https://en.wikipedia.org/wiki/Backpropagation#Matrix_multiplication
  */
-NNet backprop(NNet& net,dvec in,dvec expected);
+NNet* backprop(const NNet& net,dvec in,dvec expected);
+//adds net_b to net_a (ie, adds all their weights and biases), with net_b elements multiplied
+//by 'scalar'. useful for operations involving a gradient NNet.
+void net_add(NNet* net_a,const NNet* net_b,double scalar);
 
 struct BackPropTrainer:public Trainer{
 

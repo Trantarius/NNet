@@ -5,5 +5,5 @@
 
 
 int main(){
-    ImitatorDemo::demo_backprop();
+    ConvolverDemo::demo_backprop();
 }

@@ -62,13 +62,6 @@ namespace ConvolverDemo{
         bloc<Image> inputs=load_images("noiseimages");
         bloc<Image> outputs=load_images("images");
 
-        for(int n=0;n<inputs.size;n++){
-            if(inputs[n].get_width()!=outputs[n].get_width()||inputs[n].get_height()!=outputs[n].get_height()){
-                print("woah");
-                exit(0);
-            }
-        }
-
         ConvolverTrainer trainer(netshape,1,inputs,outputs);
         trainer.gen_callback=gen_callback;
         trainer.perf_callback=perf_callback;
@@ -79,6 +72,43 @@ namespace ConvolverDemo{
         trainer.mutation_rate=0.05;
         trainer.keep_ratio=10;
         trainer.log_enabled=true;
+
+        timer.start();
+        trainer.train();
+    }
+
+
+    //print the time it took to train the generation, and the best performance in that generation
+    //also clears the loadbar
+    void gen_callback_bp(ConvolverBackPropTrainer* trainer,size_t n,NNet* net){
+        double t=timer.stop();
+        double perf=trainer->perform(*net);
+        printw(16,Timer::format(t),perf," "," "," "," ");
+        timer.start();
+    }
+
+    //print a loadbar for how far along this generation we are
+    void img_callback_bp(ConvolverBackPropTrainer* trainer,size_t n,NNet* net){
+        //static std::mutex mtx;
+        //mtx.lock();
+        print_loadbar((double)n/trainer->samples_per_gen);
+        //mtx.unlock();
+    }
+
+    void demo_backprop(){
+        srand(time(NULL));
+        Netshape netshape(vec<size_t>(27,3),Activation::tanh);
+
+        bloc<Image> inputs=load_images("noiseimages");
+        bloc<Image> outputs=load_images("images");
+
+        ConvolverBackPropTrainer trainer(netshape,1,inputs,outputs);
+        trainer.gen_callback=gen_callback_bp;
+        trainer.img_callback=img_callback_bp;
+
+        trainer.gen_count=100;
+        trainer.samples_per_net=10;
+        trainer.learn_rate=0.05;
 
         timer.start();
         trainer.train();

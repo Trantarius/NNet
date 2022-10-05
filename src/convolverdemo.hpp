@@ -19,4 +19,5 @@ namespace ConvolverDemo{
     bloc<Image> load_images(path dir);
 
     void demo();
+    void demo_backprop();
 }
