@@ -13,8 +13,8 @@ double ih_rand(){
 }
 
 NNet::NNet(Netshape shape):shape(shape){
-    weights=new dmat[shape.layers.size()-1];
-    biases=new dvec[shape.layers.size()-1];
+    weights=bloc<dmat>(shape.layers.size()-1);
+    biases=bloc<dvec>(shape.layers.size()-1);
 
     //start off with weights+biases that pass through some or all of the last layers output
     for(size_t layer=0;layer<shape.layers.size()-1;layer++){
@@ -25,8 +25,8 @@ NNet::NNet(Netshape shape):shape(shape){
 NNet::NNet(vec<size_t> shape,ActivationFunction actfunc):NNet(Netshape(shape,actfunc)){}
 
 NNet::~NNet(){
-    delete [] weights;
-    delete [] biases;
+    weights.destroy();
+    biases.destroy();
 }
 
 void NNet::mutate(double sd){

@@ -45,8 +45,8 @@ struct NNet{
 
     //arrays of weights and biases for the corresponding layers. since the first layer is
     //a perceptron layer, there are shape.layers.size()-1 matrices and vectors
-    dmat* weights=nullptr;
-    dvec* biases=nullptr;
+    bloc<dmat> weights;
+    bloc<dvec> biases;
 
     NNet(Netshape shape);
     NNet(vec<size_t> shape,ActivationFunction actfunc);

@@ -1,6 +1,11 @@
 #pragma once
 #include "trainer.hpp"
 
+/*
+ * Calculate gradient of a network for a specific input and desired output.
+ * see https://machinelearningmastery.com/implement-backpropagation-algorithm-scratch-python/
+ * also see https://en.wikipedia.org/wiki/Backpropagation#Matrix_multiplication
+ */
 NNet backprop(NNet& net,dvec in,dvec expected);
 
 struct BackPropTrainer:public Trainer{
