@@ -76,6 +76,8 @@ NNet* MonteCarloTrainer::train(){
             sort_descending_comp
         ));
 
+        mutation_rate*=mutation_adapt;
+
         swap(gen,alt);
         gen_callback(this,n,gen[0]);
         if(log_enabled){

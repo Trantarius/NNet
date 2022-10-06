@@ -27,6 +27,8 @@ public:
     size_t nets_per_gen=1000;
     //the standard deviation of the change of each parameter of each network between generations
     double mutation_rate=0.01;
+    //multiplies the mutation rate every generation for a primitive adaptive learning rate
+    double mutation_adapt=1.0;
     //determines how strongly to bias the next generation to be descended from the best of the last generation
     //reasonable range is [0.5,inf); 0.5 is no bias
     //at 8,  ~50% come from the best 10%

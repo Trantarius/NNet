@@ -2,6 +2,8 @@
 #include "util.hpp"
 #include <cmath>
 
+uint64_t xorshift64();
+
 //bundles an activation function with its derivative, which can be used for backpropogation
 //see namespace Activation below for examples
 struct ActivationFunction{

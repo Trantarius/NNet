@@ -91,9 +91,9 @@ PigBoard::STATE PigBoard::move_pig(){
         }
         for(int r=0;r<size;r++){
             for(int c=0;c<size;c++){
-                if(path_field[r][c]){continue;}
-                if(operator[](r)[c]==1){continue;}
-                if(in_bounds(r-1,c) && path_field[r-1][c]){
+                if(path_field[r][c]){tmp_field[r][c]=path_field[r][c];}
+                else if(operator[](r)[c]==WALL){continue;}
+                else if(in_bounds(r-1,c) && path_field[r-1][c]){
                     tmp_field[r][c]=path_field[r-1][c];
                     changed=true;
                 }else if(in_bounds(r+1,c) && path_field[r+1][c]){
@@ -108,14 +108,15 @@ PigBoard::STATE PigBoard::move_pig(){
                 }
             }
         }
-        path_field=tmp_field;
+        swap(path_field,tmp_field);
+        //path_field=tmp_field;
     }
     return PIG_LOSE;
 }
 
 PigBoard PigBoard::random(int size){
     PigBoard board(size);
-    constexpr auto randf=[](){return rand()/(double)RAND_MAX;};
+    constexpr auto randf=[](){return xorshift64()/(double)(~0ul);};
 
     for(int r=0;r<size;r++){
         for(int c=0;c<size;c++){
@@ -181,7 +182,7 @@ Timer timer;
 //also clears the loadbar
 void gen_callback(MonteCarloTrainer* trainer,size_t n,NNet* net){
     double t=timer.stop();
-    printw(16,Timer::format(t),net->performance," "," "," "," ");
+    printw(16,n,Timer::format(t),net->performance," "," "," "," ");
     timer.start();
 }
 
@@ -201,10 +202,11 @@ void pig_demo(){
     trainer.gen_callback=gen_callback;
     trainer.perf_callback=perf_callback;
 
-    trainer.gen_count=100;
-    trainer.samples_per_net=100;
+    trainer.gen_count=1000;
+    trainer.samples_per_net=1000;
     trainer.nets_per_gen=1000;
-    trainer.mutation_rate=0.05;
+    trainer.mutation_rate=0.2;
+    trainer.mutation_adapt=0.997;
     trainer.keep_ratio=10;
     trainer.log_enabled=true;
 
