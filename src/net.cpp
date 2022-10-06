@@ -12,6 +12,21 @@ double ih_rand(){
     return ret-6;
 }
 
+NetGradient::NetGradient(Netshape shape):shape(shape){
+    weights=bloc<dmat>(shape.layers.size()-1);
+    biases=bloc<dvec>(shape.layers.size()-1);
+
+    for(size_t layer=0;layer<shape.layers.size()-1;layer++){
+        weights[layer]=dmat(shape.layers[layer+1],shape.layers[layer]).fill(0);
+        biases[layer]=dvec(shape.layers[layer+1]).fill(0);
+    }
+}
+
+NetGradient::~NetGradient(){
+    weights.destroy();
+    biases.destroy();
+}
+
 NNet::NNet(Netshape shape):shape(shape){
     weights=bloc<dmat>(shape.layers.size()-1);
     biases=bloc<dvec>(shape.layers.size()-1);
