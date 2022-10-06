@@ -28,14 +28,6 @@ struct Netshape{
         layers(layers),actfunc(actfunc){}
 };
 
-struct NetGradient{
-    Netshape shape;
-    bloc<dmat> weights;
-    bloc<dvec> biases;
-
-    NetGradient(Netshape shape);
-    ~NetGradient();
-};
 
 /*
  * A single instance of a neural network. This is a fairly standard feed-forward network.
