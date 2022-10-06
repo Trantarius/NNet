@@ -1,9 +1,6 @@
 #include "montecarlo.hpp"
 #include <fstream>
 
-double randf(){
-    return (double)rand()/RAND_MAX;
-}
 
 //takes indices evenly distibuted in [0,max] and returns indices biased towards 0 in [0,max]
 size_t biased_idx(size_t base,size_t bias_strength,size_t max){
@@ -48,8 +45,15 @@ NNet* MonteCarloTrainer::train(){
     vec<NNet*> alt(nets_per_gen);
     for(size_t n=0;n<nets_per_gen;n++){
         gen[n]=new NNet(net_shape);
+        gen[n]->mutate(1.0);
         alt[n]=new NNet(net_shape);
     }
+
+    std::sort(alt.ptr(),alt.ptr()+alt.size(),(
+        sort_mode==SORT_MODE::ASCENDING?
+        sort_ascending_comp:
+        sort_descending_comp
+    ));
 
     std::fstream logfile;
     if(log_enabled){

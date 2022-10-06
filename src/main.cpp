@@ -2,8 +2,10 @@
 #include "imitatordemo.hpp"
 #include "convolverdemo.hpp"
 #include "backprop.hpp"
+#include "pigtrap.hpp"
 
 
 int main(){
-    ImitatorDemo::demo_backprop();
+    srand(time(NULL));
+    pig_demo();
 }

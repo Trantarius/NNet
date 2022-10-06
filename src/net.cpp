@@ -2,14 +2,35 @@
 #include "net.hpp"
 #include <cmath>
 
+
+uint64_t xorshift64()
+{
+    static uint64_t state=121423134UL;
+    uint64_t x = state;
+    x ^= x << 13;
+    x ^= x >> 7;
+    x ^= x << 17;
+    return state = x;
+}
+
+double randf(){
+    return xorshift64()/(double)(~0ul);
+    //return (double)rand()/RAND_MAX;
+}
+
 //approximation of a normally distributed random number
 //see https://en.wikipedia.org/wiki/Irwin-Hall_distribution#Approximating_a_Normal_distribution
 double ih_rand(){
     double ret=0;
     for(int n=0;n<12;n++){
-        ret+=(rand()/(double)RAND_MAX);
+        ret+=randf();
     }
     return ret-6;
+}
+
+//faster alternative to ih_rand
+double randvar(){
+    return 2*randf()-1;
 }
 
 NetGradient::NetGradient(Netshape shape):shape(shape){
@@ -30,10 +51,9 @@ NetGradient::~NetGradient(){
 NNet::NNet(Netshape shape):shape(shape){
     weights=bloc<dmat>(shape.layers.size()-1);
     biases=bloc<dvec>(shape.layers.size()-1);
-
-    //start off with weights+biases that pass through some or all of the last layers output
     for(size_t layer=0;layer<shape.layers.size()-1;layer++){
-        weights[layer]=dmat::identity(shape.layers[layer+1],shape.layers[layer]);
+        weights[layer]=dmat(shape.layers[layer+1],shape.layers[layer]);
+        weights[layer].fill(0);
         biases[layer]=dvec(shape.layers[layer+1]).fill(0);
     }
 }
