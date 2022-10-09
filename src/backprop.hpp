@@ -25,6 +25,6 @@ struct BackPropTrainer:public Trainer{
 
     BackPropTrainer(Netshape shape):Trainer(shape){}
 
-    NNet* train();
+    NNet train();
     virtual Sample sample(size_t n)=0;
 };

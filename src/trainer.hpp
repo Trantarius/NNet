@@ -11,5 +11,5 @@ public:
 
     Trainer(Netshape shape):net_shape(shape){}
 
-    virtual NNet* train()=0;
+    virtual NNet train()=0;
 };

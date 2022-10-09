@@ -37,7 +37,7 @@ struct NetTask:public Task{
     NetTask(vec<NNet*>* last,vec<NNet*>* next,MonteCarloTrainer* trainer,size_t n):
     last(last),next(next),trainer(trainer),n(n){}
 };
-NNet* MonteCarloTrainer::train(){
+NNet MonteCarloTrainer::train(){
 
     //make 2 generations of networks. we will train back and forth between these generations to
     //avoid reallocating a whole generation of nets.
@@ -98,6 +98,8 @@ NNet* MonteCarloTrainer::train(){
         delete gen[n];
         delete alt[n];
     }
-    return ret;
+    NNet net=*ret;
+    delete ret;
+    return net;
 }
 

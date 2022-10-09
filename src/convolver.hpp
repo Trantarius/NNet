@@ -49,7 +49,7 @@ public:
     //average gradient for every pixel in an image
     NNet* backprop_img(const NNet& net,const Image& input,const Image& expected);
 
-    NNet* train();
+    NNet train();
 
     typedef void(*callback_t)(ConvolverBackPropTrainer*,size_t,NNet*);
 

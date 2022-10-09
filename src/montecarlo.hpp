@@ -44,7 +44,7 @@ public:
 
     virtual double perform(const NNet& net)=0;
 
-    NNet* train();
+    NNet train();
 
     Threadpool* get_threadpool(){return &threadpool;}
 };

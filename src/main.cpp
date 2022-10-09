@@ -17,5 +17,5 @@ int main(){
     dvec in(1,2,3,4,5,6,7,8);
     print(net.eval(in));
     print(deser.eval(in));
-    //pig_demo();
+    pig_demo();
 }

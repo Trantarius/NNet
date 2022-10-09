@@ -200,7 +200,7 @@ double ConvolverBackPropTrainer::perform(const NNet& net){
     return totalerr/(double)samples_per_net;
 }
 
-NNet* ConvolverBackPropTrainer::train(){
+NNet ConvolverBackPropTrainer::train(){
     NNet* net=new NNet(net_shape);
     net->mutate(1.0);
     for(size_t g=0;g<gen_count;g++){
@@ -220,5 +220,7 @@ NNet* ConvolverBackPropTrainer::train(){
         gen_callback(this,g,net);
         delete avg_grad;
     }
-    return net;
+    NNet ret=*net;
+    delete net;
+    return ret;
 }
