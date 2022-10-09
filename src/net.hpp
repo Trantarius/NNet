@@ -10,10 +10,11 @@ struct ActivationFunction{
     typedef double(*funcptr_t)(double);
     const funcptr_t activate;
     const funcptr_t derivative;
+    const uint8_t id=0;//used for serialization;
     ActivationFunction(const ActivationFunction& b):
-        activate(b.activate),derivative(b.derivative){}
-    ActivationFunction(funcptr_t act,funcptr_t der):
-        activate(act),derivative(der){}
+        activate(b.activate),derivative(b.derivative),id(b.id){}
+    ActivationFunction(funcptr_t act,funcptr_t der,uint8_t id=0):
+        activate(act),derivative(der),id(id){}
 };
 
 //determines the shape (ie, number of layers and size of each layer) and activation
@@ -29,7 +30,6 @@ struct Netshape{
     Netshape(vec<size_t> layers,ActivationFunction actfunc):
         layers(layers),actfunc(actfunc){}
 };
-
 
 /*
  * A single instance of a neural network. This is a fairly standard feed-forward network.
@@ -62,6 +62,9 @@ struct NNet{
     void mutate(double std_dev);
     NNet* clone() const;
     void copy(NNet& b);
+
+    bloc<uchar> serialize();
+    static NNet deserialize(const bloc<uchar> serial);
 };
 
 //Some common activation functions; see https://en.wikipedia.org/wiki/Activation_function
@@ -73,7 +76,8 @@ namespace Activation{
         [](double x)->double{
             double gx=1/(exp(-x)+1);
             return gx*(1-gx);
-        }
+        },
+        1
     );
     const ActivationFunction tanh=ActivationFunction(
         [](double x)->double{
@@ -82,7 +86,8 @@ namespace Activation{
         [](double x)->double{
             double gx=::tanh(x);
             return 1-gx*gx;
-        }
+        },
+        2
     );
     const ActivationFunction relu=ActivationFunction(
         [](double x)->double{
@@ -94,7 +99,8 @@ namespace Activation{
             //branchless?
             //return (copysign(1,x)+1)/2;
             return x>0?1:0;
-        }
+        },
+        3
     );
     const ActivationFunction softplus=ActivationFunction(
         [](double x)->double{
@@ -102,7 +108,8 @@ namespace Activation{
         },
         [](double x)->double{
             return 1/(exp(-x)+1);
-        }
+        },
+        4
     );
     const ActivationFunction swish=ActivationFunction(
         [](double x)->double{
@@ -111,7 +118,8 @@ namespace Activation{
         [](double x)->double{
             double ex=exp(-x);
             return (1+ex+x*ex)/((1+ex)*(1+ex));
-        }
+        },
+        5
     );
     //I just made this one up
     const ActivationFunction wave=ActivationFunction(
@@ -120,6 +128,7 @@ namespace Activation{
         },
         [](double x)->double{
             return (1-x*x/2.7182818284)/exp(x*x/5.43656365692);
-        }
+        },
+        6
     );
 }

@@ -196,7 +196,7 @@ void perf_callback(MonteCarloTrainer* trainer,size_t n,NNet* net){
 
 void pig_demo(){
     srand(time(NULL));
-    Netshape netshape(vec<size_t>(64,64,48,32,48,64),Activation::tanh);
+    Netshape netshape(vec<size_t>(64,64,64,64),Activation::tanh);
 
     PigTrapTrainer trainer(8,netshape);
     trainer.gen_callback=gen_callback;

@@ -3,9 +3,14 @@
 #include <cmath>
 
 
+uint64_t makeseed(){
+    srand(time(NULL));
+    return ((uint64_t)rand()<<32)^rand();
+}
+
 uint64_t xorshift64()
 {
-    static uint64_t state=121423134UL;
+    static uint64_t state=makeseed();
     uint64_t x = state;
     x ^= x << 13;
     x ^= x >> 7;
@@ -93,4 +98,94 @@ void NNet::copy(NNet& b){
         weights[layer]=b.weights[layer];
         biases[layer]=b.biases[layer];
     }
+}
+
+struct BinStream{
+    void* ptr;
+    template<typename T>
+    void push(T arg){
+        *(T*)ptr=arg;
+        ptr=((T*)ptr+1);
+    }
+    template<typename T>
+    T pop(){
+        T ret=*(T*)ptr;
+        ptr=((T*)ptr+1);
+        return ret;
+    }
+};
+
+//this must match what is found in namespace Activation in net.hpp
+ActivationFunction id2afunc(uint8_t id){
+    switch(id){
+        case 1:return Activation::sigmoid;
+        case 2:return Activation::tanh;
+        case 3:return Activation::relu;
+        case 4:return Activation::softplus;
+        case 5:return Activation::swish;
+        case 6:return Activation::wave;
+        default:throw std::runtime_error("invalid activation function id: "+std::to_string(id));
+    }
+}
+
+bloc<uchar> NNet::serialize(){
+    size_t total_size=0;
+    total_size+=sizeof(uint32_t);//number of layers;
+    total_size+=sizeof(uint32_t)*shape.layers.size();//size of each layer
+    total_size+=sizeof(uint8_t);//activation function (as enum)
+    for(uint l=0;l<shape.layers.size()-1;l++){
+        total_size+=sizeof(double)*shape.layers[l]*shape.layers[l+1];//weights
+        total_size+=sizeof(double)*shape.layers[l+1];//biases
+    };
+
+    bloc<uchar> ret(total_size);
+    BinStream stream;
+    stream.ptr=ret.ptr;
+
+    stream.push<uint32_t>(shape.layers.size());
+    for(uint l=0;l<shape.layers.size();l++){
+        stream.push<uint32_t>(shape.layers[l]);
+    }
+    stream.push<uint8_t>(shape.actfunc.id);
+
+    for(uint l=0;l<shape.layers.size()-1;l++){
+        void* wptr=&(weights[l]);
+        size_t wsize=weights[l].rows()*weights[l].cols()*sizeof(double);
+        memcpy(stream.ptr,wptr,wsize);
+        stream.ptr=((uchar*)(stream.ptr)+wsize);
+
+        void* bptr=biases[l].ptr();
+        size_t bsize=biases[l].size()*sizeof(double);
+        memcpy(stream.ptr,bptr,bsize);
+        stream.ptr=((uchar*)(stream.ptr)+bsize);
+    }
+
+    return ret;
+}
+
+NNet NNet::deserialize(const bloc<uchar> serial){
+    BinStream stream;
+    stream.ptr=serial.ptr;
+
+    size_t num_layers=stream.pop<uint32_t>();
+    vec<size_t> layers(num_layers);
+    for(uint l=0;l<num_layers;l++){
+        layers[l]=stream.pop<uint32_t>();
+    }
+    ActivationFunction afunc=id2afunc(stream.pop<uint8_t>());
+
+    NNet net(Netshape(layers,afunc));
+    for(uint l=0;l<num_layers-1;l++){
+        void* wptr=&(net.weights[l]);
+        size_t wsize=net.weights[l].rows()*net.weights[l].cols()*sizeof(double);
+        memcpy(wptr,stream.ptr,wsize);
+        stream.ptr=((uchar*)(stream.ptr)+wsize);
+
+        void* bptr=net.biases[l].ptr();
+        size_t bsize=net.biases[l].size()*sizeof(double);
+        memcpy(bptr,stream.ptr,bsize);
+        stream.ptr=((uchar*)(stream.ptr)+bsize);
+    }
+
+    return net;
 }
